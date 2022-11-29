@@ -47,10 +47,12 @@ class Texture(object):
         y = round(ty * self.height)
 
         try:
-            return bytes(map(lambda b: round(b*intensity) 
-                if b*intensity > 0 
-                else 0, 
-                self.pixels[y][x])
+            b, g, r = (
+                round(self.pixels[y][x][0] * intensity),
+                round(self.pixels[y][x][1] * intensity),
+                round(self.pixels[y][x][2] * intensity),
             )
         except:
-            pass
+            b, g, r = 255, 255, 255
+
+        return setColor(r, g, b)

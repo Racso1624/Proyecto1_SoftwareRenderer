@@ -378,19 +378,15 @@ class Render(object):
         # self.loadViewportMatrix()
 
 
-    def triangle(self, A, B, C, coord_tex = None, texture = None, normal_coords = None, color = None, intensity = 1):
+    def triangle(self, A, B, C, coord_tex = None, texture = None, normal_coords = None, color = None):
     
         normal = (B - A) * (C - A)
-        i = normal.norm() @ self.light.norm()
+        intensity = self.light.norm() @ normal.norm() 
 
-        if i < 0:
-            i = abs(i)
-        if i > 1:
-            i = 1
+        if intensity < 0:
+            intensity = abs(intensity)
 
-        color_tex = 1 * i
-
-        self.render_color = setColor(color_tex, color_tex, color_tex)
+        self.render_color = setColor(intensity, intensity, intensity)
 
         min, max = bounding_box(A, B, C)
         min.round_coords()
@@ -403,7 +399,7 @@ class Render(object):
                 if(w < 0 or v < 0 or u < 0):
                     continue
                 
-                z = A.z * w + B.z * v + C.z * u
+                z = A.z * w + B.z * u + C.z * v
                 if(x >= 0 and y >=0 and x < len(self.zBuffer) and y < len(self.zBuffer[0]) and z > self.zBuffer[x][y]):
                     self.zBuffer[x][y] = z
 
@@ -420,12 +416,12 @@ class Render(object):
                             texture_coords=(tA, tB, tC),
                             normals=(nA, nB, nC)
                         )
-                    elif self.texture:
+                    elif texture:
                         tA, tB, tC = coord_tex
                         tx = tA.x * w + tB.x * u + tC.x * v
                         ty = tA.y * w + tB.y * u + tC.y * v
 
-                        return  self.texture.get_color_with_intensity(tx, ty, i)
+                        color = texture.get_color_with_intensity(tx, ty, intensity)
 
                     self.glPoint(x, y, color)
                     

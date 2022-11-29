@@ -20,6 +20,14 @@ r.glClear()
 
 r.lookAt(V3(0, 0, 10), V3(0, 0, 0), V3(0, 1, 0))
 
-r.loadModel('./human.obj', translate=[512, 512, 0], scale=[400, 400, 400], rotate=(0, 0, -pi/2))
+# background = Texture('./background.bmp')
+
+# r.setBackground(background.pixels)
+
+r.light = V3(0, 0, -1)
+
+r.loadModel('./desk.obj', translate=[512, 512, 0], scale=[0.3, 0.3, 0.3], rotate=(0, -pi/6, -pi/2))
+
+r.loadModel('./desk_lamp.obj', translate=[512, 812, 0], scale=[400, 400, 400], rotate=(-pi/3, 0, -pi/2))
 
 r.glFinish("Proyecto_1.bmp")
