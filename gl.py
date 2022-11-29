@@ -404,17 +404,9 @@ class Render(object):
                     self.zBuffer[x][y] = z
 
                     if self.active_shader:
-                        nA, nB, nC = normal_coords
 
-                        self.render_color = self.active_shader(
-                            x=x,
-                            y=y,
-                            width=self.width,
-                            height=self.height,
-                            light=self.light,
-                            bar_coords=(w, u, v),
-                            texture_coords=(tA, tB, tC),
-                            normals=(nA, nB, nC)
+                        color = self.active_shader(
+                            intensity=intensity,
                         )
                     elif texture:
                         tA, tB, tC = coord_tex
