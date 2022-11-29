@@ -404,7 +404,6 @@ class Render(object):
                     self.zBuffer[x][y] = z
 
                     if self.active_shader:
-
                         color = self.active_shader(
                             intensity=intensity,
                         )

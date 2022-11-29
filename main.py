@@ -21,26 +21,35 @@ r.glClear()
 
 r.lookAt(V3(0, 0, 10), V3(0, 0, 0), V3(0, 1, 0))
 
-# background = Texture('./background.bmp')
+background = Texture('./background.bmp')
 
-# r.setBackground(background.pixels)
+r.setBackground(background.pixels)
 
 lamp_texture = Texture('./desk_lamp.bmp')
 
 cup_texture = Texture('./cup.bmp')
 
-r.loadModel('./desk_lamp.obj', translate=[612, 512, 0], scale=[500, 500, 500], rotate=(-pi/3, 0, -pi/2), texture=lamp_texture)
+book_texture = Texture('./book.bmp')
 
-r.loadModel('./book.obj', translate=[612, 112, 0], scale=[500, 500, 500], rotate=(-pi/3, -pi/2, -pi/2))
 
-r.loadModel('./cup.obj', translate=[612, 712, 0], scale=[10, 10, 10], rotate=(0, 0, -pi/2), texture=cup_texture)
+#Modelos con Texturas
+r.loadModel('./desk_lamp.obj', translate=[470, 550, 0], scale=[650, 650, 650], rotate=(-pi/3, 0, -pi/2), texture=lamp_texture)
 
-r.loadModel('./sharpener.obj', translate=[912, 712, 0], scale=[500, 500, 500], rotate=(0, 0, -pi/2))
+r.loadModel('./book.obj', translate=[535, 250, 0], scale=[10, 10, 10], rotate=(0, -pi/2, -pi/2), texture=book_texture)
+
+r.loadModel('./cup.obj', translate=[470, 712, 0], scale=[7, 7, 7], rotate=(0, 0, -pi/2), texture=cup_texture)
+
+#Modelos con Shaders
+r.setShader(dragon_shader)
+r.loadModel('./mask.obj', translate=[770, 712, 0], scale=[150, 150, 150], rotate=(0, 0, -pi/2))
+
+r.setShader(sharpener_shader)
+r.loadModel('./sharpener.obj', translate=[1100, 850, 0], scale=[900, 900, 900], rotate=(0, 0, -pi/2))
 
 r.setShader(glasses_shader)
-r.loadModel('./glasses.obj', translate=[612, 312, 0], scale=[500, 500, 500], rotate=(0, 0, -pi/2))
+r.loadModel('./glasses.obj', translate=[470, 450, 0], scale=[600, 600, 600], rotate=(-pi/3, 0, -pi/2))
 
 r.setShader(table_shader)
-r.loadModel('./desk.obj', translate=[112, 512, 0], scale=[0.5, 0.5, 0.5], rotate=(0, -pi/6, -pi/2))
+r.loadModel('./desk.obj', translate=[30, 540, 0], scale=[0.6, 0.6, 0.6], rotate=(0, 0, -pi/2))
 
 r.glFinish("Proyecto_1.bmp")
