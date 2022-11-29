@@ -234,8 +234,20 @@ class Render(object):
                     tC = V3(*model.tvertices[t3])
                     tD = V3(*model.tvertices[t4])
 
-                    self.triangle(v1, v2, v3, (tA, tB, tC), texture)
-                    self.triangle(v1, v3, v4, (tA, tC, tD), texture)
+                    if(model.nvertices):
+
+                        n1 = face[0][2] - 1
+                        n2 = face[1][2] - 1
+                        n3 = face[2][2] - 1
+                        n4 = face[3][2] - 1
+
+                        nA = V3(*model.nvertices[n1])
+                        nB = V3(*model.nvertices[n2])
+                        nC = V3(*model.nvertices[n3])
+                        nD = V3(*model.nvertices[n4])
+
+                    self.triangle(v1, v2, v3, (tA, tB, tC), texture, (nA, nB, nC))
+                    self.triangle(v1, v3, v4, (tA, tC, tD), texture, (nA, nC, nD))
 
             
             elif vcount == 3:
@@ -258,7 +270,17 @@ class Render(object):
                     tB = V3(*model.tvertices[t2])
                     tC = V3(*model.tvertices[t3])
 
-                    self.triangle(v1, v2, v3, (tA, tB, tC), texture)
+                    if(model.nvertices):
+
+                        n1 = face[0][2] - 1
+                        n2 = face[1][2] - 1
+                        n3 = face[2][2] - 1
+
+                        nA = V3(*model.nvertices[n1])
+                        nB = V3(*model.nvertices[n2])
+                        nC = V3(*model.nvertices[n3])
+
+                    self.triangle(v1, v2, v3, (tA, tB, tC), texture, (nA, nB, nC))
 
     def loadModelMatrix(self, translate, scale, rotate):
 
@@ -356,7 +378,7 @@ class Render(object):
         # self.loadViewportMatrix()
 
 
-    def triangle(self, A, B, C, cord_tex = None, texture = None, color = None, intensity = 1):
+    def triangle(self, A, B, C, coord_tex = None, texture = None, normal_coords = None, color = None, intensity = 1):
     
         normal = (B - A) * (C - A)
         i = normal.norm() @ self.light.norm()
@@ -380,40 +402,38 @@ class Render(object):
 
                 if(w < 0 or v < 0 or u < 0):
                     continue
-
-                if self.active_shader:
-                    self.render_color = self.active_shader
-                else:
-                    if texture:
-                        tA, tB, tC = cord_tex
-                        tx = tA.x * w + tB.x * u + tC.x * v
-                        ty = tA.y * w + tB.y * u + tC.y * v
-
-                        color = texture.get_color_with_intensity(tx, ty, intensity)
-
+                
                 z = A.z * w + B.z * v + C.z * u
                 if(x >= 0 and y >=0 and x < len(self.zBuffer) and y < len(self.zBuffer[0]) and z > self.zBuffer[x][y]):
                     self.zBuffer[x][y] = z
+
+                    if self.active_shader:
+                        nA, nB, nC = normal_coords
+
+                        self.render_color = self.active_shader(
+                            x=x,
+                            y=y,
+                            width=self.width,
+                            height=self.height,
+                            light=self.light,
+                            bar_coords=(w, u, v),
+                            texture_coords=(tA, tB, tC),
+                            normals=(nA, nB, nC)
+                        )
+                    elif self.texture:
+                        tA, tB, tC = coord_tex
+                        tx = tA.x * w + tB.x * u + tC.x * v
+                        ty = tA.y * w + tB.y * u + tC.y * v
+
+                        return  self.texture.get_color_with_intensity(tx, ty, i)
+
                     self.glPoint(x, y, color)
                     
-    def shader(self, **kwargs):
-        w, u, v = kwargs['bar']
-        L = kwargs['light']
-        A, B, C = kwargs['vertices']
-        tA, tB, tC = kwargs['texture_coords']
-        nA, nB, nC = kwargs['normals']
+    def setShader(self, shader):
+        self.active_shader = shader
 
-        iA = nA.norm() @ L.norm()
-        iB = nB.norm() @ L.norm()
-        iC = nC.norm() @ L.norm()
-
-        i = iA * w + iB * u + iC * v
-
-        if self.texture:
-            tx = tA.x * w + tB.x * u + tC.x * v
-            ty = tA.y * w + tB.y * u + tC.y * v
-
-            return  self.texture.get_color_with_intensity(tx, ty, i)
+    def setBackground(self, background):
+        self.framebuffer = background
 
     def glFinish(self, filename):
         f = open(filename, 'bw')
